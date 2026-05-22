@@ -9,38 +9,344 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransparencyRouteImport } from './routes/transparency'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AppSubmitRouteImport } from './routes/app.submit'
+import { Route as AppMySuggestionsRouteImport } from './routes/app.my-suggestions'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminMassReplyRouteImport } from './routes/admin.mass-reply'
+import { Route as AdminInboxRouteImport } from './routes/admin.inbox'
+import { Route as AppSuggestionsIdRouteImport } from './routes/app.suggestions.$id'
 
+const TransparencyRoute = TransparencyRouteImport.update({
+  id: '/transparency',
+  path: '/transparency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppSubmitRoute = AppSubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMySuggestionsRoute = AppMySuggestionsRouteImport.update({
+  id: '/my-suggestions',
+  path: '/my-suggestions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMassReplyRoute = AdminMassReplyRouteImport.update({
+  id: '/mass-reply',
+  path: '/mass-reply',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInboxRoute = AdminInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppSuggestionsIdRoute = AppSuggestionsIdRouteImport.update({
+  id: '/suggestions/$id',
+  path: '/suggestions/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/app': typeof AppRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
+  '/transparency': typeof TransparencyRoute
+  '/admin/inbox': typeof AdminInboxRoute
+  '/admin/mass-reply': typeof AdminMassReplyRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/app/my-suggestions': typeof AppMySuggestionsRoute
+  '/app/submit': typeof AppSubmitRoute
+  '/admin/': typeof AdminIndexRoute
+  '/app/suggestions/$id': typeof AppSuggestionsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app': typeof AppRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
+  '/transparency': typeof TransparencyRoute
+  '/admin/inbox': typeof AdminInboxRoute
+  '/admin/mass-reply': typeof AdminMassReplyRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/app/my-suggestions': typeof AppMySuggestionsRoute
+  '/app/submit': typeof AppSubmitRoute
+  '/admin': typeof AdminIndexRoute
+  '/app/suggestions/$id': typeof AppSuggestionsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/app': typeof AppRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
+  '/transparency': typeof TransparencyRoute
+  '/admin/inbox': typeof AdminInboxRoute
+  '/admin/mass-reply': typeof AdminMassReplyRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/app/my-suggestions': typeof AppMySuggestionsRoute
+  '/app/submit': typeof AppSubmitRoute
+  '/admin/': typeof AdminIndexRoute
+  '/app/suggestions/$id': typeof AppSuggestionsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/app'
+    | '/contact'
+    | '/faq'
+    | '/forgot-password'
+    | '/how-it-works'
+    | '/login'
+    | '/reset-password'
+    | '/signup'
+    | '/transparency'
+    | '/admin/inbox'
+    | '/admin/mass-reply'
+    | '/admin/users'
+    | '/app/my-suggestions'
+    | '/app/submit'
+    | '/admin/'
+    | '/app/suggestions/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/app'
+    | '/contact'
+    | '/faq'
+    | '/forgot-password'
+    | '/how-it-works'
+    | '/login'
+    | '/reset-password'
+    | '/signup'
+    | '/transparency'
+    | '/admin/inbox'
+    | '/admin/mass-reply'
+    | '/admin/users'
+    | '/app/my-suggestions'
+    | '/app/submit'
+    | '/admin'
+    | '/app/suggestions/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/app'
+    | '/contact'
+    | '/faq'
+    | '/forgot-password'
+    | '/how-it-works'
+    | '/login'
+    | '/reset-password'
+    | '/signup'
+    | '/transparency'
+    | '/admin/inbox'
+    | '/admin/mass-reply'
+    | '/admin/users'
+    | '/app/my-suggestions'
+    | '/app/submit'
+    | '/admin/'
+    | '/app/suggestions/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HowItWorksRoute: typeof HowItWorksRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignupRoute: typeof SignupRoute
+  TransparencyRoute: typeof TransparencyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transparency': {
+      id: '/transparency'
+      path: '/transparency'
+      fullPath: '/transparency'
+      preLoaderRoute: typeof TransparencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +354,101 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/app/submit': {
+      id: '/app/submit'
+      path: '/submit'
+      fullPath: '/app/submit'
+      preLoaderRoute: typeof AppSubmitRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/my-suggestions': {
+      id: '/app/my-suggestions'
+      path: '/my-suggestions'
+      fullPath: '/app/my-suggestions'
+      preLoaderRoute: typeof AppMySuggestionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/mass-reply': {
+      id: '/admin/mass-reply'
+      path: '/mass-reply'
+      fullPath: '/admin/mass-reply'
+      preLoaderRoute: typeof AdminMassReplyRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/inbox': {
+      id: '/admin/inbox'
+      path: '/inbox'
+      fullPath: '/admin/inbox'
+      preLoaderRoute: typeof AdminInboxRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/app/suggestions/$id': {
+      id: '/app/suggestions/$id'
+      path: '/suggestions/$id'
+      fullPath: '/app/suggestions/$id'
+      preLoaderRoute: typeof AppSuggestionsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminInboxRoute: typeof AdminInboxRoute
+  AdminMassReplyRoute: typeof AdminMassReplyRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminInboxRoute: AdminInboxRoute,
+  AdminMassReplyRoute: AdminMassReplyRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface AppRouteChildren {
+  AppMySuggestionsRoute: typeof AppMySuggestionsRoute
+  AppSubmitRoute: typeof AppSubmitRoute
+  AppSuggestionsIdRoute: typeof AppSuggestionsIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppMySuggestionsRoute: AppMySuggestionsRoute,
+  AppSubmitRoute: AppSubmitRoute,
+  AppSuggestionsIdRoute: AppSuggestionsIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
+  ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  HowItWorksRoute: HowItWorksRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignupRoute: SignupRoute,
+  TransparencyRoute: TransparencyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
