@@ -46,6 +46,7 @@ export function SiteHeader() {
               <Link to="/signup"><Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4">Get Started</Button></Link>
             </>
           )}
+          {!loading && user && <NotificationsBell />}
           {!loading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
