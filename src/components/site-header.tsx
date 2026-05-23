@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationsBell } from "./notifications-bell";
 
 export function SiteHeader() {
   const { theme, toggle } = useTheme();
