@@ -63,6 +63,22 @@ function SuggestionDetail() {
         <h1 className="font-serif text-4xl">{s.title}</h1>
         <p className="mt-5 whitespace-pre-wrap text-muted-foreground leading-relaxed">{s.body}</p>
         <div className="mt-6 text-xs text-muted-foreground">Submitted {new Date(s.created_at).toLocaleString()}</div>
+        {data.attachments.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-border">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5"><Paperclip className="h-3 w-3" />Attachments</div>
+            <ul className="grid sm:grid-cols-2 gap-2">
+              {data.attachments.map((a) => (
+                <li key={a.id}>
+                  <a href={a.url ?? "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm hover:bg-muted transition">
+                    <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="truncate flex-1">{a.filename}</span>
+                    <span className="text-xs text-muted-foreground">{((a.size_bytes ?? 0)/1024).toFixed(0)} KB</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <h2 className="font-serif text-2xl mt-10 mb-4">Responses</h2>
