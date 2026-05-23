@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, MessageSquare, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MessageSquare, ShieldCheck, Paperclip } from "lucide-react";
+import * as React from "react";
 
 export const Route = createFileRoute("/app/suggestions/$id")({
   head: () => ({ meta: [{ title: "Suggestion — Mukuba" }] }),
@@ -18,17 +19,32 @@ const STATUS_STYLES: Record<string, string> = {
 
 function SuggestionDetail() {
   const { id } = Route.useParams();
+  const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["suggestion", id],
     queryFn: async () => {
-      const [s, r] = await Promise.all([
+      const [s, r, a] = await Promise.all([
         supabase.from("suggestions").select("*").eq("id", id).single(),
         supabase.from("responses").select("id,body,created_at,is_internal_note").eq("suggestion_id", id).eq("is_internal_note", false).order("created_at"),
+        supabase.from("attachments").select("id,filename,storage_path,mime_type,size_bytes").eq("suggestion_id", id),
       ]);
       if (s.error) throw s.error;
-      return { suggestion: s.data, responses: r.data ?? [] };
+      const attachments = await Promise.all((a.data ?? []).map(async (att) => {
+        const { data: signed } = await supabase.storage.from("suggestion-attachments").createSignedUrl(att.storage_path, 3600);
+        return { ...att, url: signed?.signedUrl ?? null };
+      }));
+      return { suggestion: s.data, responses: r.data ?? [], attachments };
     },
   });
+
+  React.useEffect(() => {
+    const ch = supabase
+      .channel(`suggestion-${id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "responses", filter: `suggestion_id=eq.${id}` }, () => qc.invalidateQueries({ queryKey: ["suggestion", id] }))
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "suggestions", filter: `id=eq.${id}` }, () => qc.invalidateQueries({ queryKey: ["suggestion", id] }))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [id, qc]);
 
   if (isLoading) return <div className="max-w-3xl mx-auto"><div className="h-40 rounded-xl bg-muted animate-pulse" /></div>;
   if (!data) return null;
@@ -47,6 +63,22 @@ function SuggestionDetail() {
         <h1 className="font-serif text-4xl">{s.title}</h1>
         <p className="mt-5 whitespace-pre-wrap text-muted-foreground leading-relaxed">{s.body}</p>
         <div className="mt-6 text-xs text-muted-foreground">Submitted {new Date(s.created_at).toLocaleString()}</div>
+        {data.attachments.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-border">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5"><Paperclip className="h-3 w-3" />Attachments</div>
+            <ul className="grid sm:grid-cols-2 gap-2">
+              {data.attachments.map((a) => (
+                <li key={a.id}>
+                  <a href={a.url ?? "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm hover:bg-muted transition">
+                    <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="truncate flex-1">{a.filename}</span>
+                    <span className="text-xs text-muted-foreground">{((a.size_bytes ?? 0)/1024).toFixed(0)} KB</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <h2 className="font-serif text-2xl mt-10 mb-4">Responses</h2>

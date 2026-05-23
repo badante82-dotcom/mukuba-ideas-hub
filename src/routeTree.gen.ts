@@ -25,6 +25,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AppSubmitRouteImport } from './routes/app.submit'
 import { Route as AppMySuggestionsRouteImport } from './routes/app.my-suggestions'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminModerationRouteImport } from './routes/admin.moderation'
 import { Route as AdminMassReplyRouteImport } from './routes/admin.mass-reply'
 import { Route as AdminInboxRouteImport } from './routes/admin.inbox'
 import { Route as AppSuggestionsIdRouteImport } from './routes/app.suggestions.$id'
@@ -109,6 +110,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminModerationRoute = AdminModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMassReplyRoute = AdminMassReplyRouteImport.update({
   id: '/mass-reply',
   path: '/mass-reply',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/transparency': typeof TransparencyRoute
   '/admin/inbox': typeof AdminInboxRoute
   '/admin/mass-reply': typeof AdminMassReplyRoute
+  '/admin/moderation': typeof AdminModerationRoute
   '/admin/users': typeof AdminUsersRoute
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/transparency': typeof TransparencyRoute
   '/admin/inbox': typeof AdminInboxRoute
   '/admin/mass-reply': typeof AdminMassReplyRoute
+  '/admin/moderation': typeof AdminModerationRoute
   '/admin/users': typeof AdminUsersRoute
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/transparency': typeof TransparencyRoute
   '/admin/inbox': typeof AdminInboxRoute
   '/admin/mass-reply': typeof AdminMassReplyRoute
+  '/admin/moderation': typeof AdminModerationRoute
   '/admin/users': typeof AdminUsersRoute
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/transparency'
     | '/admin/inbox'
     | '/admin/mass-reply'
+    | '/admin/moderation'
     | '/admin/users'
     | '/app/my-suggestions'
     | '/app/submit'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/transparency'
     | '/admin/inbox'
     | '/admin/mass-reply'
+    | '/admin/moderation'
     | '/admin/users'
     | '/app/my-suggestions'
     | '/app/submit'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/transparency'
     | '/admin/inbox'
     | '/admin/mass-reply'
+    | '/admin/moderation'
     | '/admin/users'
     | '/app/my-suggestions'
     | '/app/submit'
@@ -382,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/moderation': {
+      id: '/admin/moderation'
+      path: '/moderation'
+      fullPath: '/admin/moderation'
+      preLoaderRoute: typeof AdminModerationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/mass-reply': {
       id: '/admin/mass-reply'
       path: '/mass-reply'
@@ -409,6 +428,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminInboxRoute: typeof AdminInboxRoute
   AdminMassReplyRoute: typeof AdminMassReplyRoute
+  AdminModerationRoute: typeof AdminModerationRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -416,6 +436,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminInboxRoute: AdminInboxRoute,
   AdminMassReplyRoute: AdminMassReplyRoute,
+  AdminModerationRoute: AdminModerationRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

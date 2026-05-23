@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/logo";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, LayoutDashboard, Inbox, Send, Users } from "lucide-react";
+import { Moon, Sun, LayoutDashboard, Inbox, Send, Users, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
@@ -28,6 +28,7 @@ function AdminShell() {
               {[
                 { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
                 { to: "/admin/inbox", label: "Inbox", icon: Inbox },
+                { to: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
                 { to: "/admin/mass-reply", label: "Mass reply", icon: Send },
                 { to: "/admin/users", label: "Users", icon: Users },
               ].map((n) => (

@@ -37,9 +37,24 @@ function Inbox() {
     refetch();
   };
 
+  const exportCsv = () => {
+    const rows = data ?? [];
+    const header = ["id","title","category","priority","status","responses","created_at"];
+    const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const csv = [header.join(","), ...rows.map((r) => [r.id, r.title, r.category, r.priority, r.status, r.responses_count, r.created_at].map(escape).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `suggestions-${filter}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
-      <h1 className="font-serif text-4xl mb-6">Inbox</h1>
+      <div className="flex items-center justify-between mb-6 gap-4">
+        <h1 className="font-serif text-4xl">Inbox</h1>
+        <button onClick={exportCsv} className="text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted">Export CSV</button>
+      </div>
       <div className="flex flex-wrap gap-2 mb-6">
         <button onClick={() => setFilter("all")} className={`text-xs px-3 py-1.5 rounded-full border ${filter === "all" ? "bg-navy text-white border-navy" : "border-border"}`}>All</button>
         {STATUSES.map((s) => (
