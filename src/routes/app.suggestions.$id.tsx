@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, MessageSquare, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MessageSquare, ShieldCheck, Paperclip } from "lucide-react";
+import * as React from "react";
 
 export const Route = createFileRoute("/app/suggestions/$id")({
   head: () => ({ meta: [{ title: "Suggestion — Mukuba" }] }),
