@@ -19,17 +19,32 @@ const STATUS_STYLES: Record<string, string> = {
 
 function SuggestionDetail() {
   const { id } = Route.useParams();
+  const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["suggestion", id],
     queryFn: async () => {
-      const [s, r] = await Promise.all([
+      const [s, r, a] = await Promise.all([
         supabase.from("suggestions").select("*").eq("id", id).single(),
         supabase.from("responses").select("id,body,created_at,is_internal_note").eq("suggestion_id", id).eq("is_internal_note", false).order("created_at"),
+        supabase.from("attachments").select("id,filename,storage_path,mime_type,size_bytes").eq("suggestion_id", id),
       ]);
       if (s.error) throw s.error;
-      return { suggestion: s.data, responses: r.data ?? [] };
+      const attachments = await Promise.all((a.data ?? []).map(async (att) => {
+        const { data: signed } = await supabase.storage.from("suggestion-attachments").createSignedUrl(att.storage_path, 3600);
+        return { ...att, url: signed?.signedUrl ?? null };
+      }));
+      return { suggestion: s.data, responses: r.data ?? [], attachments };
     },
   });
+
+  React.useEffect(() => {
+    const ch = supabase
+      .channel(`suggestion-${id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "responses", filter: `suggestion_id=eq.${id}` }, () => qc.invalidateQueries({ queryKey: ["suggestion", id] }))
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "suggestions", filter: `id=eq.${id}` }, () => qc.invalidateQueries({ queryKey: ["suggestion", id] }))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [id, qc]);
 
   if (isLoading) return <div className="max-w-3xl mx-auto"><div className="h-40 rounded-xl bg-muted animate-pulse" /></div>;
   if (!data) return null;
