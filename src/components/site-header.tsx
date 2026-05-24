@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "./logo";
 import { useTheme } from "./theme-provider";
 import { useAuth } from "./auth-provider";
-import { Moon, Sun, LogOut, LayoutDashboard, Inbox } from "lucide-react";
+import { Moon, Sun, LogOut, LayoutDashboard, Inbox, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -17,7 +17,8 @@ import { NotificationsBell } from "./notifications-bell";
 
 export function SiteHeader() {
   const { theme, toggle } = useTheme();
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, roles, loading } = useAuth();
+  const isStaff = roles.includes("staff") || roles.includes("stakeholder");
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -58,6 +59,11 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/app/my-suggestions"><Inbox className="mr-2 h-4 w-4" />My suggestions</Link>
                 </DropdownMenuItem>
+                {isStaff && !isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/staff"><Briefcase className="mr-2 h-4 w-4" />Staff dashboard</Link>
+                  </DropdownMenuItem>
+                )}
                 {isAdmin && (
                   <DropdownMenuItem asChild>
                     <Link to="/admin"><LayoutDashboard className="mr-2 h-4 w-4" />Admin</Link>
