@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransparencyRouteImport } from './routes/transparency'
+import { Route as StaffRouteImport } from './routes/staff'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
@@ -21,6 +22,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AppSubmitRouteImport } from './routes/app.submit'
 import { Route as AppMySuggestionsRouteImport } from './routes/app.my-suggestions'
@@ -33,6 +35,11 @@ import { Route as AppSuggestionsIdRouteImport } from './routes/app.suggestions.$
 const TransparencyRoute = TransparencyRouteImport.update({
   id: '/transparency',
   path: '/transparency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -90,6 +97,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StaffRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -143,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/staff': typeof StaffRouteWithChildren
   '/transparency': typeof TransparencyRoute
   '/admin/inbox': typeof AdminInboxRoute
   '/admin/mass-reply': typeof AdminMassReplyRoute
@@ -151,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
   '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/app/suggestions/$id': typeof AppSuggestionsIdRoute
 }
 export interface FileRoutesByTo {
@@ -172,6 +186,7 @@ export interface FileRoutesByTo {
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
   '/admin': typeof AdminIndexRoute
+  '/staff': typeof StaffIndexRoute
   '/app/suggestions/$id': typeof AppSuggestionsIdRoute
 }
 export interface FileRoutesById {
@@ -187,6 +202,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/staff': typeof StaffRouteWithChildren
   '/transparency': typeof TransparencyRoute
   '/admin/inbox': typeof AdminInboxRoute
   '/admin/mass-reply': typeof AdminMassReplyRoute
@@ -195,6 +211,7 @@ export interface FileRoutesById {
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
   '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/app/suggestions/$id': typeof AppSuggestionsIdRoute
 }
 export interface FileRouteTypes {
@@ -211,6 +228,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/staff'
     | '/transparency'
     | '/admin/inbox'
     | '/admin/mass-reply'
@@ -219,6 +237,7 @@ export interface FileRouteTypes {
     | '/app/my-suggestions'
     | '/app/submit'
     | '/admin/'
+    | '/staff/'
     | '/app/suggestions/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -240,6 +259,7 @@ export interface FileRouteTypes {
     | '/app/my-suggestions'
     | '/app/submit'
     | '/admin'
+    | '/staff'
     | '/app/suggestions/$id'
   id:
     | '__root__'
@@ -254,6 +274,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/staff'
     | '/transparency'
     | '/admin/inbox'
     | '/admin/mass-reply'
@@ -262,6 +283,7 @@ export interface FileRouteTypes {
     | '/app/my-suggestions'
     | '/app/submit'
     | '/admin/'
+    | '/staff/'
     | '/app/suggestions/$id'
   fileRoutesById: FileRoutesById
 }
@@ -277,6 +299,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  StaffRoute: typeof StaffRouteWithChildren
   TransparencyRoute: typeof TransparencyRoute
 }
 
@@ -287,6 +310,13 @@ declare module '@tanstack/react-router' {
       path: '/transparency'
       fullPath: '/transparency'
       preLoaderRoute: typeof TransparencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -365,6 +395,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/staff/': {
+      id: '/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof StaffRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -457,6 +494,16 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface StaffRouteChildren {
+  StaffIndexRoute: typeof StaffIndexRoute
+}
+
+const StaffRouteChildren: StaffRouteChildren = {
+  StaffIndexRoute: StaffIndexRoute,
+}
+
+const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -469,8 +516,19 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  StaffRoute: StaffRouteWithChildren,
   TransparencyRoute: TransparencyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

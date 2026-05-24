@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/transparency")({
   head: () => ({ meta: [{ title: "Transparency Portal — Mukuba Suggestion Box" }, { name: "description", content: "Browse resolved suggestions and see how Mukuba University is responding to its community." }] }),
@@ -11,8 +13,12 @@ export const Route = createFileRoute("/transparency")({
 });
 
 function TransparencyPage() {
+  const { user, loading } = useAuth();
+  const locked = !loading && !user;
+
   const { data, isLoading } = useQuery({
-    queryKey: ["transparency"],
+    queryKey: ["transparency", !!user],
+    enabled: !loading,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("suggestions")
@@ -20,7 +26,7 @@ function TransparencyPage() {
         .eq("status", "resolved")
         .eq("is_public", true)
         .order("resolved_at", { ascending: false })
-        .limit(50);
+        .limit(locked ? 6 : 50);
       if (error) throw error;
       return data ?? [];
     },
@@ -32,14 +38,15 @@ function TransparencyPage() {
       <main className="flex-1">
         <section className="bg-navy-gradient text-white py-20">
           <div className="container mx-auto px-4 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald/30 bg-emerald/10 px-3 py-1 text-xs font-medium text-emerald-soft">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald/30 bg-emerald/10 px-3 py-1 text-xs font-medium text-emerald-soft fade-up">
               <CheckCircle2 className="h-3.5 w-3.5" /> Public accountability
             </div>
-            <h1 className="mt-5 font-serif text-5xl md:text-6xl">Transparency Portal</h1>
-            <p className="mt-4 max-w-xl mx-auto text-white/70">Every resolved suggestion, published openly. See real change happening across campus.</p>
+            <h1 className="mt-5 font-serif text-5xl md:text-6xl fade-up" style={{ animationDelay: "60ms" }}>Transparency Portal</h1>
+            <p className="mt-4 max-w-xl mx-auto text-white/70 fade-up" style={{ animationDelay: "140ms" }}>Every resolved suggestion, published openly. See real change happening across campus.</p>
           </div>
         </section>
-        <section className="container mx-auto px-4 py-16 max-w-4xl">
+
+        <section className="container mx-auto px-4 py-16 max-w-4xl relative">
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => <div key={i} className="h-28 rounded-xl bg-muted animate-pulse" />)}
@@ -51,27 +58,51 @@ function TransparencyPage() {
               <p className="mt-2 text-muted-foreground">Check back soon — published outcomes will appear here.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {data.map((s) => (
-                <article key={s.id} className="rounded-2xl border border-border bg-card p-6 hover:border-emerald/40 transition-colors">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-xs uppercase tracking-wide text-emerald font-semibold">{s.category}</div>
-                      <h3 className="mt-1 font-serif text-2xl">{s.title}</h3>
+            <div className="relative">
+              <div className={locked ? "space-y-4 select-none pointer-events-none [filter:blur(8px)]" : "space-y-4"} aria-hidden={locked}>
+                {data.map((s, i) => (
+                  <article
+                    key={s.id}
+                    className="rounded-2xl border border-border bg-card p-6 hover:border-emerald/40 transition-colors hover-lift fade-up"
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-xs uppercase tracking-wide text-emerald font-semibold">{s.category}</div>
+                        <h3 className="mt-1 font-serif text-2xl">{s.title}</h3>
+                      </div>
+                      <div className="text-xs text-muted-foreground whitespace-nowrap">
+                        {s.resolved_at ? new Date(s.resolved_at).toLocaleDateString() : ""}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground whitespace-nowrap">
-                      {s.resolved_at ? new Date(s.resolved_at).toLocaleDateString() : ""}
+                    <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{s.body}</p>
+                    <div className="mt-4 flex items-center gap-2 text-xs">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald/10 text-emerald px-2.5 py-1">
+                        <CheckCircle2 className="h-3 w-3" /> Resolved
+                      </span>
+                      <span className="text-muted-foreground">{s.upvotes_count} upvotes</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {locked && (
+                <div className="absolute inset-0 flex items-start justify-center pt-16">
+                  <div className="max-w-md w-[92%] rounded-2xl border border-border bg-card/95 backdrop-blur-md p-8 text-center shadow-xl fade-up">
+                    <div className="mx-auto h-12 w-12 rounded-full bg-emerald/10 text-emerald grid place-items-center">
+                      <Lock className="h-5 w-5" />
+                    </div>
+                    <h2 className="mt-4 font-serif text-3xl">Sign in to see resolved suggestions</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      The transparency portal is reserved for the Mukuba community. Sign in or create an account to view how the university is responding.
+                    </p>
+                    <div className="mt-6 flex flex-wrap justify-center gap-2">
+                      <Link to="/login"><Button className="rounded-full px-5">Sign in</Button></Link>
+                      <Link to="/signup"><Button variant="outline" className="rounded-full px-5">Create account</Button></Link>
                     </div>
                   </div>
-                  <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{s.body}</p>
-                  <div className="mt-4 flex items-center gap-2 text-xs">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald/10 text-emerald px-2.5 py-1">
-                      <CheckCircle2 className="h-3 w-3" /> Resolved
-                    </span>
-                    <span className="text-muted-foreground">{s.upvotes_count} upvotes</span>
-                  </div>
-                </article>
-              ))}
+                </div>
+              )}
             </div>
           )}
         </section>
