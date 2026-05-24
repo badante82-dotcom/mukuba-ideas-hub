@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.anonymize_suggestion_author() FROM PUBLIC, anon, authenticated;
