@@ -25,6 +25,27 @@ const STATUS_STYLES: Record<string, string> = {
 function SuggestionDetail() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
+  const { user, isAdmin, roles } = useAuth();
+  const canRespond = isAdmin || roles.includes("staff");
+  const [reply, setReply] = React.useState("");
+  const [sending, setSending] = React.useState(false);
+
+  const sendReply = async () => {
+    if (!user || reply.trim().length < 3) return;
+    setSending(true);
+    const { error } = await supabase.from("responses").insert({
+      suggestion_id: id,
+      author_id: user.id,
+      body: reply.trim(),
+      is_internal_note: false,
+    });
+    setSending(false);
+    if (error) { toast.error(error.message); return; }
+    setReply("");
+    toast.success("Response posted");
+    qc.invalidateQueries({ queryKey: ["suggestion", id] });
+  };
+
   const { data, isLoading } = useQuery({
     queryKey: ["suggestion", id],
     queryFn: async () => {
