@@ -94,10 +94,11 @@ function StaffDashboard() {
           <h3 className="font-serif text-2xl">Quick actions</h3>
           <p className="mt-1 text-sm text-white/70">Tools you reach for every day.</p>
           <div className="mt-5 space-y-2">
-            <Link to="/app/submit"><Button className="w-full justify-between rounded-full">Submit a suggestion <Send className="h-4 w-4" /></Button></Link>
-            <Link to="/app/my-suggestions"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">My suggestions <Inbox className="h-4 w-4" /></Button></Link>
-            <Link to="/transparency"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">Resolved feed <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link to="/staff/inbox"><Button className="w-full justify-between rounded-full">Open inbox <Inbox className="h-4 w-4" /></Button></Link>
+            <Link to="/app/submit"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">Submit a suggestion <Send className="h-4 w-4" /></Button></Link>
+            <Link to="/app/my-suggestions"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">My suggestions <ArrowRight className="h-4 w-4" /></Button></Link>
           </div>
+
         </div>
       </div>
     </div>
