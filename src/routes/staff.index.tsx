@@ -14,7 +14,7 @@ function StaffDashboard() {
   const { user } = useAuth();
 
   const { data } = useQuery({
-  const { data } = useQuery({
+
     queryKey: ["staff-overview", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
