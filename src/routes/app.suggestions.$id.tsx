@@ -1,13 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, MessageSquare, ShieldCheck, Paperclip } from "lucide-react";
+import { ArrowLeft, MessageSquare, ShieldCheck, Paperclip, Send } from "lucide-react";
 import * as React from "react";
+import { useAuth } from "@/components/auth-provider";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/suggestions/$id")({
   head: () => ({ meta: [{ title: "Suggestion — Mukuba" }] }),
   component: SuggestionDetail,
 });
+
 
 const STATUS_STYLES: Record<string, string> = {
   submitted: "bg-muted text-muted-foreground",
