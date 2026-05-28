@@ -126,6 +126,21 @@ function SuggestionDetail() {
           ))}
         </div>
       )}
+
+      {canRespond && (
+        <div className="mt-6 rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-3 text-xs font-semibold text-emerald">
+            <ShieldCheck className="h-3.5 w-3.5" /> Respond as {isAdmin ? "Administration" : "Staff"}
+          </div>
+          <Textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={4} placeholder="Write a public response to the submitter…" maxLength={4000} />
+          <div className="mt-3 flex justify-end">
+            <Button onClick={sendReply} disabled={sending || reply.trim().length < 3} className="rounded-full">
+              <Send className="h-4 w-4 mr-1.5" />{sending ? "Sending…" : "Post response"}
+            </Button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
