@@ -28,12 +28,13 @@ function StaffShell() {
               {[
                 { to: "/staff", label: "Dashboard", icon: LayoutDashboard, exact: true },
                 { to: "/app/my-suggestions", label: "My items", icon: Inbox },
+              {[
+                { to: "/staff", label: "Dashboard", icon: LayoutDashboard, exact: true },
+                { to: "/staff/inbox", label: "Inbox", icon: Inbox },
                 { to: "/app/submit", label: "Submit", icon: Send },
                 { to: "/transparency", label: "Resolved", icon: CheckCircle2 },
               ].map((n) => (
-                <Link key={n.to} to={n.to} activeOptions={{ exact: n.exact }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-white/70 hover:bg-white/5 hover:text-white" activeProps={{ className: "bg-white/10 text-white" }}>
-                  <n.icon className="h-3.5 w-3.5" />{n.label}
-                </Link>
+
               ))}
             </nav>
           </div>
