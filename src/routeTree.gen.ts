@@ -24,6 +24,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as StaffInboxRouteImport } from './routes/staff.inbox'
 import { Route as AppSubmitRouteImport } from './routes/app.submit'
 import { Route as AppMySuggestionsRouteImport } from './routes/app.my-suggestions'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -107,6 +108,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const StaffInboxRoute = StaffInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => StaffRoute,
+} as any)
 const AppSubmitRoute = AppSubmitRouteImport.update({
   id: '/submit',
   path: '/submit',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
+  '/staff/inbox': typeof StaffInboxRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/app/suggestions/$id': typeof AppSuggestionsIdRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
+  '/staff/inbox': typeof StaffInboxRoute
   '/admin': typeof AdminIndexRoute
   '/staff': typeof StaffIndexRoute
   '/app/suggestions/$id': typeof AppSuggestionsIdRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/app/my-suggestions': typeof AppMySuggestionsRoute
   '/app/submit': typeof AppSubmitRoute
+  '/staff/inbox': typeof StaffInboxRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/app/suggestions/$id': typeof AppSuggestionsIdRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/app/my-suggestions'
     | '/app/submit'
+    | '/staff/inbox'
     | '/admin/'
     | '/staff/'
     | '/app/suggestions/$id'
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/app/my-suggestions'
     | '/app/submit'
+    | '/staff/inbox'
     | '/admin'
     | '/staff'
     | '/app/suggestions/$id'
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/app/my-suggestions'
     | '/app/submit'
+    | '/staff/inbox'
     | '/admin/'
     | '/staff/'
     | '/app/suggestions/$id'
@@ -410,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/staff/inbox': {
+      id: '/staff/inbox'
+      path: '/inbox'
+      fullPath: '/staff/inbox'
+      preLoaderRoute: typeof StaffInboxRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/app/submit': {
       id: '/app/submit'
       path: '/submit'
@@ -495,10 +514,12 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface StaffRouteChildren {
+  StaffInboxRoute: typeof StaffInboxRoute
   StaffIndexRoute: typeof StaffIndexRoute
 }
 
 const StaffRouteChildren: StaffRouteChildren = {
+  StaffInboxRoute: StaffInboxRoute,
   StaffIndexRoute: StaffIndexRoute,
 }
 
@@ -522,3 +543,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -14,13 +14,16 @@ function StaffDashboard() {
   const { user } = useAuth();
 
   const { data } = useQuery({
+
     queryKey: ["staff-overview", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const [mine, resolved, recent] = await Promise.all([
+      const [mine, resolved, recent, pending, inProgress] = await Promise.all([
         supabase.from("suggestions").select("id,status").eq("author_id", user!.id),
         supabase.from("suggestions").select("id", { count: "exact", head: true }).eq("status", "resolved").eq("is_public", true),
         supabase.from("suggestions").select("id,title,category,resolved_at").eq("status", "resolved").eq("is_public", true).order("resolved_at", { ascending: false }).limit(5),
+        supabase.from("suggestions").select("id", { count: "exact", head: true }).eq("status", "submitted"),
+        supabase.from("suggestions").select("id", { count: "exact", head: true }).in("status", ["under_review","in_progress"]),
       ]);
       const items = mine.data ?? [];
       return {
@@ -28,17 +31,20 @@ function StaffDashboard() {
         minePending: items.filter((s) => s.status !== "resolved").length,
         mineResolved: items.filter((s) => s.status === "resolved").length,
         resolvedTotal: resolved.count ?? 0,
+        awaiting: pending.count ?? 0,
+        active: inProgress.count ?? 0,
         recent: recent.data ?? [],
       };
     },
   });
 
   const metrics = [
-    { label: "My submissions", value: data?.mineTotal ?? 0, icon: MessageSquare },
-    { label: "Awaiting action", value: data?.minePending ?? 0, icon: Clock },
-    { label: "My resolved", value: data?.mineResolved ?? 0, icon: CheckCircle2 },
+    { label: "Awaiting triage", value: data?.awaiting ?? 0, icon: Clock },
+    { label: "In progress", value: data?.active ?? 0, icon: MessageSquare },
     { label: "Campus-wide resolved", value: data?.resolvedTotal ?? 0, icon: CheckCircle2 },
+    { label: "My submissions", value: data?.mineTotal ?? 0, icon: MessageSquare },
   ];
+
 
   return (
     <div className="space-y-8 fade-up">
@@ -88,10 +94,11 @@ function StaffDashboard() {
           <h3 className="font-serif text-2xl">Quick actions</h3>
           <p className="mt-1 text-sm text-white/70">Tools you reach for every day.</p>
           <div className="mt-5 space-y-2">
-            <Link to="/app/submit"><Button className="w-full justify-between rounded-full">Submit a suggestion <Send className="h-4 w-4" /></Button></Link>
-            <Link to="/app/my-suggestions"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">My suggestions <Inbox className="h-4 w-4" /></Button></Link>
-            <Link to="/transparency"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">Resolved feed <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link to="/staff/inbox"><Button className="w-full justify-between rounded-full">Open inbox <Inbox className="h-4 w-4" /></Button></Link>
+            <Link to="/app/submit"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">Submit a suggestion <Send className="h-4 w-4" /></Button></Link>
+            <Link to="/app/my-suggestions"><Button variant="outline" className="w-full justify-between rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">My suggestions <ArrowRight className="h-4 w-4" /></Button></Link>
           </div>
+
         </div>
       </div>
     </div>

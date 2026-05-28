@@ -27,7 +27,7 @@ function StaffShell() {
             <nav className="hidden md:flex items-center gap-1 text-sm">
               {[
                 { to: "/staff", label: "Dashboard", icon: LayoutDashboard, exact: true },
-                { to: "/app/my-suggestions", label: "My items", icon: Inbox },
+                { to: "/staff/inbox", label: "Inbox", icon: Inbox },
                 { to: "/app/submit", label: "Submit", icon: Send },
                 { to: "/transparency", label: "Resolved", icon: CheckCircle2 },
               ].map((n) => (
@@ -35,6 +35,7 @@ function StaffShell() {
                   <n.icon className="h-3.5 w-3.5" />{n.label}
                 </Link>
               ))}
+
             </nav>
           </div>
           <div className="flex items-center gap-2">
