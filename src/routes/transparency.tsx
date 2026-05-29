@@ -20,13 +20,14 @@ function TransparencyPage() {
     queryKey: ["transparency", !!user],
     enabled: !loading,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("suggestions")
-        .select("id,title,body,category,resolved_at,upvotes_count")
-        .eq("status", "resolved")
-        .eq("is_public", true)
-        .order("resolved_at", { ascending: false })
-        .limit(locked ? 6 : 50);
+        .select("id,title,body,category,status,resolved_at,created_at,upvotes_count")
+        .eq("is_public", true);
+      if (locked) q = q.eq("status", "resolved");
+      const { data, error } = await q
+        .order("created_at", { ascending: false })
+        .limit(locked ? 6 : 100);
       if (error) throw error;
       return data ?? [];
     },
