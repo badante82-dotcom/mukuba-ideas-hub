@@ -61,9 +61,11 @@ function TransparencyPage() {
             <div className="relative">
               <div className={locked ? "space-y-4 select-none pointer-events-none [filter:blur(8px)]" : "space-y-4"} aria-hidden={locked}>
                 {data.map((s, i) => (
-                  <article
+                  <Link
                     key={s.id}
-                    className="rounded-2xl border border-border bg-card p-6 hover:border-emerald/40 transition-colors hover-lift fade-up"
+                    to="/app/suggestions/$id"
+                    params={{ id: s.id }}
+                    className="block rounded-2xl border border-border bg-card p-6 hover:border-emerald/40 transition-all hover-lift fade-up hover:shadow-md hover:bg-accent/30"
                     style={{ animationDelay: `${i * 50}ms` }}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -82,7 +84,7 @@ function TransparencyPage() {
                       </span>
                       <span className="text-muted-foreground">{s.upvotes_count} upvotes</span>
                     </div>
-                  </article>
+                  </Link>
                 ))}
               </div>
 
