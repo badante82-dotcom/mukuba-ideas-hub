@@ -55,13 +55,19 @@ function TransparencyPage() {
           ) : !data?.length ? (
             <div className="text-center py-20">
               <CheckCircle2 className="h-10 w-10 text-emerald mx-auto mb-3 opacity-50" />
-              <h2 className="font-serif text-2xl">No resolved suggestions yet</h2>
-              <p className="mt-2 text-muted-foreground">Check back soon — published outcomes will appear here.</p>
+              <h2 className="font-serif text-2xl">No public suggestions yet</h2>
+              <p className="mt-2 text-muted-foreground">Be the first to submit one — it will appear here.</p>
             </div>
           ) : (
             <div className="relative">
               <div className={locked ? "space-y-4 select-none pointer-events-none [filter:blur(8px)]" : "space-y-4"} aria-hidden={locked}>
-                {data.map((s, i) => (
+                {data.map((s, i) => {
+                  const statusLabel = s.status.replace(/_/g, " ");
+                  const isResolved = s.status === "resolved";
+                  const dateStr = isResolved && s.resolved_at
+                    ? new Date(s.resolved_at).toLocaleDateString()
+                    : new Date(s.created_at).toLocaleDateString();
+                  return (
                   <Link
                     key={s.id}
                     to="/app/suggestions/$id"
@@ -74,20 +80,20 @@ function TransparencyPage() {
                         <div className="text-xs uppercase tracking-wide text-emerald font-semibold">{s.category}</div>
                         <h3 className="mt-1 font-serif text-2xl">{s.title}</h3>
                       </div>
-                      <div className="text-xs text-muted-foreground whitespace-nowrap">
-                        {s.resolved_at ? new Date(s.resolved_at).toLocaleDateString() : ""}
-                      </div>
+                      <div className="text-xs text-muted-foreground whitespace-nowrap">{dateStr}</div>
                     </div>
                     <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{s.body}</p>
                     <div className="mt-4 flex items-center gap-2 text-xs">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald/10 text-emerald px-2.5 py-1">
-                        <CheckCircle2 className="h-3 w-3" /> Resolved
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 capitalize ${isResolved ? "bg-emerald/10 text-emerald" : "bg-muted text-foreground/70"}`}>
+                        {isResolved && <CheckCircle2 className="h-3 w-3" />} {statusLabel}
                       </span>
                       <span className="text-muted-foreground">{s.upvotes_count} upvotes</span>
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
+
 
               {locked && (
                 <div className="absolute inset-0 flex items-start justify-center pt-16">
