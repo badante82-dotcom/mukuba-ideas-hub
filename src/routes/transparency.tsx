@@ -43,7 +43,7 @@ function TransparencyPage() {
               <CheckCircle2 className="h-3.5 w-3.5" /> Public accountability
             </div>
             <h1 className="mt-5 font-serif text-5xl md:text-6xl fade-up" style={{ animationDelay: "60ms" }}>Transparency Portal</h1>
-            <p className="mt-4 max-w-xl mx-auto text-white/70 fade-up" style={{ animationDelay: "140ms" }}>Every resolved suggestion, published openly. See real change happening across campus.</p>
+            <p className="mt-4 max-w-xl mx-auto text-white/70 fade-up" style={{ animationDelay: "140ms" }}>Every public suggestion, open for the community — from newly submitted ideas to resolved outcomes.</p>
           </div>
         </section>
 
