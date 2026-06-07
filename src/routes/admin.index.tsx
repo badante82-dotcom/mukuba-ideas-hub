@@ -12,7 +12,7 @@ export const Route = createFileRoute("/admin/")({
 const COLORS = ["#10b981", "#14b8a6", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#6366f1", "#64748b"];
 
 function Overview() {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["admin-overview"],
     queryFn: async () => {
       const { data: all } = await supabase.from("suggestions").select("id,status,category,created_at,resolved_at");
@@ -51,7 +51,9 @@ function Overview() {
         <p className="mt-1 text-muted-foreground">Real-time pulse of the suggestion platform.</p>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((m) => (
+        {isLoading ? [1,2,3,4].map((i) => (
+          <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />
+        )) : metrics.map((m) => (
           <div key={m.label} className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center justify-between">
               <div className="text-xs text-muted-foreground uppercase tracking-wider">{m.label}</div>
@@ -65,27 +67,27 @@ function Overview() {
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6">
           <div className="font-semibold mb-1">Submissions (last 14 days)</div>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            {isLoading ? <div className="h-full rounded-xl bg-muted animate-pulse" /> : <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.days ?? []}>
                 <XAxis dataKey="day" stroke="oklch(0.55 0.02 260)" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke="oklch(0.55 0.02 260)" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip cursor={{ fill: "oklch(0.95 0.01 240 / 0.3)" }} contentStyle={{ borderRadius: 8, border: "1px solid oklch(0.92 0.012 250)", fontSize: 12 }} />
                 <Bar dataKey="count" fill="oklch(0.7 0.16 165)" radius={[6, 6, 0, 0]} />
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer>}
           </div>
         </div>
         <div className="rounded-2xl border border-border bg-card p-6">
           <div className="font-semibold mb-1">By category</div>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            {isLoading ? <div className="h-full rounded-xl bg-muted animate-pulse" /> : <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={data?.byCategory ?? []} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={3}>
                   {(data?.byCategory ?? []).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
               </PieChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer>}
           </div>
         </div>
       </div>

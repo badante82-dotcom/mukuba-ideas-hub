@@ -72,7 +72,7 @@ function StaffInbox() {
                   <Link to="/app/suggestions/$id" params={{ id: s.id }} className="font-semibold hover:underline">{s.title}</Link>
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.body}</p>
                 </div>
-                <select value={updatingId === s.id ? s.status : s.status} disabled={updatingId === s.id} onChange={(e) => setStatus(s.id, e.target.value as SuggestionStatus)} className="h-8 rounded-md border border-input bg-transparent px-2 text-xs disabled:opacity-60">
+                <select value={s.status} disabled={updatingId === s.id} onChange={(e) => setStatus(s.id, e.target.value as SuggestionStatus)} className="h-8 rounded-md border border-input bg-transparent px-2 text-xs disabled:opacity-60">
                   {STAFF_STATUS_OPTIONS.map((st) => <option key={st.value} value={st.value}>{st.label}</option>)}
                 </select>
               </div>
