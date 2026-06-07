@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageSquare } from "lucide-react";
 import { getStatusBadgeClass, getSuggestionStatusLabel } from "@/lib/suggestion-status";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/app/my-suggestions")({
   head: () => ({ meta: [{ title: "My suggestions — Mukuba" }] }),
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/app/my-suggestions")({
 
 function MySuggestions() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["my-suggestions", user?.id],
     enabled: !!user?.id,
@@ -26,6 +28,20 @@ function MySuggestions() {
       return data ?? [];
     },
   });
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`my-suggestions-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "suggestions", filter: `author_id=eq.${user.id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["my-suggestions", user.id] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, user?.id]);
 
   return (
     <div className="max-w-4xl mx-auto">

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getStatusBadgeClass, getSuggestionStatusLabel, STAFF_STATUS_OPTIONS, type SuggestionStatus } from "@/lib/suggestion-status";
 
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/admin/inbox")({
 });
 
 function Inbox() {
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState<SuggestionStatus | "all">("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { data, isLoading, refetch } = useQuery({
@@ -34,6 +35,19 @@ function Inbox() {
     toast.success(`Marked ${getSuggestionStatusLabel(status).toLowerCase()}`);
     refetch();
   };
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-inbox-suggestions")
+      .on("postgres_changes", { event: "*", schema: "public", table: "suggestions" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-inbox"] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const exportCsv = () => {
     const rows = data ?? [];
