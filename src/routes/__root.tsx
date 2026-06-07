@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useIsFetching, useIsMutating, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -11,7 +11,7 @@ import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/components/auth-provider";
+import { AuthProvider, useAuth } from "@/components/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -111,14 +111,32 @@ function AuthInvalidator() {
   const qc = useQueryClient();
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      if (event === "SIGNED_OUT") {
+        qc.clear();
         router.invalidate();
+        return;
+      }
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
         qc.invalidateQueries();
       }
     });
     return () => subscription.unsubscribe();
   }, [router, qc]);
   return null;
+}
+
+function GlobalLoadingIndicator() {
+  const { loading } = useAuth();
+  const fetching = useIsFetching();
+  const mutating = useIsMutating();
+  const active = loading || fetching > 0 || mutating > 0;
+
+  return (
+    <div
+      aria-hidden={!active}
+      className={`fixed inset-x-0 top-0 z-[100] h-1 bg-primary transition-opacity duration-200 ${active ? "opacity-100 animate-pulse" : "opacity-0"}`}
+    />
+  );
 }
 
 function RootComponent() {
@@ -128,6 +146,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <AuthInvalidator />
+          <GlobalLoadingIndicator />
           <Outlet />
           <Toaster />
         </AuthProvider>
