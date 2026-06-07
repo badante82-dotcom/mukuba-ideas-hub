@@ -7,20 +7,13 @@ import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { getStatusBadgeClass, getSuggestionStatusLabel } from "@/lib/suggestion-status";
 
 export const Route = createFileRoute("/app/suggestions/$id")({
   head: () => ({ meta: [{ title: "Suggestion — Mukuba" }] }),
   component: SuggestionDetail,
 });
 
-
-const STATUS_STYLES: Record<string, string> = {
-  submitted: "bg-muted text-muted-foreground",
-  under_review: "bg-blue-500/10 text-blue-600",
-  in_progress: "bg-amber-500/10 text-amber-600",
-  resolved: "bg-emerald/10 text-emerald",
-  rejected: "bg-destructive/10 text-destructive",
-};
 
 function SuggestionDetail() {
   const { id } = Route.useParams();
@@ -72,7 +65,7 @@ function SuggestionDetail() {
     return () => { supabase.removeChannel(ch); };
   }, [id, qc]);
 
-  if (isLoading) return <div className="max-w-3xl mx-auto"><div className="h-40 rounded-xl bg-muted animate-pulse" /></div>;
+  if (isLoading) return <div className="max-w-3xl mx-auto space-y-4"><div className="h-8 w-32 rounded-md bg-muted animate-pulse" /><div className="h-52 rounded-xl bg-muted animate-pulse" /><div className="h-28 rounded-xl bg-muted animate-pulse" /></div>;
   if (!data) return null;
   const s = data.suggestion;
 
@@ -83,7 +76,7 @@ function SuggestionDetail() {
       </Link>
       <div className="rounded-2xl border border-border bg-card p-8">
         <div className="flex items-center gap-2 mb-3">
-          <span className={`text-xs px-2.5 py-1 rounded-full capitalize ${STATUS_STYLES[s.status] ?? "bg-muted"}`}>{s.status.replace("_"," ")}</span>
+          <span className={`text-xs px-2.5 py-1 rounded-full ${getStatusBadgeClass(s.status)}`}>{getSuggestionStatusLabel(s.status)}</span>
           <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{s.category}</span>
         </div>
         <h1 className="font-serif text-4xl">{s.title}</h1>
