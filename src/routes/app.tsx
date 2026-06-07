@@ -4,10 +4,16 @@ import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/app")({
+  ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/login" });
   },
+  pendingComponent: () => (
+    <div className="min-h-screen grid place-items-center bg-background text-sm text-muted-foreground">
+      Loading your workspace…
+    </div>
+  ),
   component: () => (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />

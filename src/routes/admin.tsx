@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, LayoutDashboard, Inbox, Send, Users, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
+  ssr: false,
   beforeLoad: async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) throw redirect({ to: "/login" });
@@ -13,6 +14,11 @@ export const Route = createFileRoute("/admin")({
     const ok = (roles ?? []).some((r) => r.role === "admin" || r.role === "super_admin");
     if (!ok) throw redirect({ to: "/" });
   },
+  pendingComponent: () => (
+    <div className="min-h-screen grid place-items-center bg-background text-sm text-muted-foreground">
+      Loading admin tools…
+    </div>
+  ),
   component: AdminShell,
 });
 
