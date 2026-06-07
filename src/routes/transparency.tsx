@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Lock } from "lucide-react";
 import { getStatusBadgeClass, getSuggestionStatusLabel, getTransparencyStatus, type TransparencyStatus } from "@/lib/suggestion-status";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/transparency")({
   head: () => ({ meta: [{ title: "Transparency Portal — Mukuba Suggestion Box" }, { name: "description", content: "Browse resolved suggestions and see how Mukuba University is responding to its community." }] }),
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/transparency")({
 
 function TransparencyPage() {
   const { user, loading } = useAuth();
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState<TransparencyStatus | "all">("all");
   const locked = !loading && !user;
 
@@ -35,6 +36,20 @@ function TransparencyPage() {
       return data ?? [];
     },
   });
+
+  useEffect(() => {
+    if (locked) return;
+    const channel = supabase
+      .channel("transparency-suggestions")
+      .on("postgres_changes", { event: "*", schema: "public", table: "suggestions" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["transparency", !!user] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [locked, queryClient, user]);
 
   const counts = useMemo(() => {
     const rows = data ?? [];
