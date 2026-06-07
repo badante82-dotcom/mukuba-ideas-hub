@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useIsFetching, useIsMutating, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -9,11 +9,11 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/components/auth-provider";
+import { AuthProvider, useAuth } from "@/components/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
@@ -106,13 +106,32 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PreviewStylesFallback() {
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("__lovable_token");
+    if (!token || document.getElementById("preview-styles-fallback")) return;
+
+    const link = document.createElement("link");
+    link.id = "preview-styles-fallback";
+    link.rel = "stylesheet";
+    link.href = `${appCss}${appCss.includes("?") ? "&" : "?"}__lovable_token=${encodeURIComponent(token)}`;
+    document.head.appendChild(link);
+  }, []);
+
+  return null;
+}
+
 function AuthInvalidator() {
   const router = useRouter();
   const qc = useQueryClient();
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      if (event === "SIGNED_OUT") {
+        qc.clear();
         router.invalidate();
+        return;
+      }
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
         qc.invalidateQueries();
       }
     });
@@ -121,13 +140,29 @@ function AuthInvalidator() {
   return null;
 }
 
+function GlobalLoadingIndicator() {
+  const { loading } = useAuth();
+  const fetching = useIsFetching();
+  const mutating = useIsMutating();
+  const active = loading || fetching > 0 || mutating > 0;
+
+  return (
+    <div
+      aria-hidden={!active}
+      className={`fixed inset-x-0 top-0 z-[100] h-1 bg-primary transition-opacity duration-200 ${active ? "opacity-100 animate-pulse" : "opacity-0"}`}
+    />
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          <PreviewStylesFallback />
           <AuthInvalidator />
+          <GlobalLoadingIndicator />
           <Outlet />
           <Toaster />
         </AuthProvider>

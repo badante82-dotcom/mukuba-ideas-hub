@@ -1,17 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageSquare } from "lucide-react";
-
-const STATUS_STYLES: Record<string, string> = {
-  submitted: "bg-muted text-muted-foreground",
-  under_review: "bg-blue-500/10 text-blue-600",
-  in_progress: "bg-amber-500/10 text-amber-600",
-  resolved: "bg-emerald/10 text-emerald",
-  rejected: "bg-destructive/10 text-destructive",
-};
+import { getStatusBadgeClass, getSuggestionStatusLabel } from "@/lib/suggestion-status";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/app/my-suggestions")({
   head: () => ({ meta: [{ title: "My suggestions — Mukuba" }] }),
@@ -20,6 +14,7 @@ export const Route = createFileRoute("/app/my-suggestions")({
 
 function MySuggestions() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["my-suggestions", user?.id],
     enabled: !!user?.id,
@@ -33,6 +28,20 @@ function MySuggestions() {
       return data ?? [];
     },
   });
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`my-suggestions-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "suggestions", filter: `author_id=eq.${user.id}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["my-suggestions", user.id] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, user?.id]);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -60,7 +69,7 @@ function MySuggestions() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${STATUS_STYLES[s.status] ?? "bg-muted"}`}>{s.status.replace("_"," ")}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusBadgeClass(s.status)}`}>{getSuggestionStatusLabel(s.status)}</span>
                       <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{s.category}</span>
                     </div>
                     <h3 className="font-semibold truncate">{s.title}</h3>

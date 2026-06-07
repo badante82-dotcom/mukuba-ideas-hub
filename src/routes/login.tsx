@@ -22,8 +22,10 @@ function LoginPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const toastId = toast.loading("Signing you in…");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
+    toast.dismiss(toastId);
     if (error) return toast.error(error.message);
     toast.success("Welcome back");
     navigate({ to: "/app/my-suggestions" });

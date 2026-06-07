@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Lock } from "lucide-react";
+import { getStatusBadgeClass, getSuggestionStatusLabel, getTransparencyStatus, type TransparencyStatus } from "@/lib/suggestion-status";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/transparency")({
   head: () => ({ meta: [{ title: "Transparency Portal — Mukuba Suggestion Box" }, { name: "description", content: "Browse resolved suggestions and see how Mukuba University is responding to its community." }] }),
@@ -14,6 +16,8 @@ export const Route = createFileRoute("/transparency")({
 
 function TransparencyPage() {
   const { user, loading } = useAuth();
+  const queryClient = useQueryClient();
+  const [filter, setFilter] = useState<TransparencyStatus | "all">("all");
   const locked = !loading && !user;
 
   const { data, isLoading } = useQuery({
@@ -32,6 +36,36 @@ function TransparencyPage() {
       return data ?? [];
     },
   });
+
+  useEffect(() => {
+    if (locked) return;
+    const channel = supabase
+      .channel("transparency-suggestions")
+      .on("postgres_changes", { event: "*", schema: "public", table: "suggestions" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["transparency", !!user] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [locked, queryClient, user]);
+
+  const counts = useMemo(() => {
+    const rows = data ?? [];
+    return {
+      all: rows.length,
+      pending: rows.filter((s) => getTransparencyStatus(s.status) === "pending").length,
+      resolved: rows.filter((s) => getTransparencyStatus(s.status) === "resolved").length,
+      denied: rows.filter((s) => getTransparencyStatus(s.status) === "denied").length,
+    };
+  }, [data]);
+
+  const visibleSuggestions = useMemo(() => {
+    const rows = data ?? [];
+    if (filter === "all") return rows;
+    return rows.filter((s) => getTransparencyStatus(s.status) === filter);
+  }, [data, filter]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -60,9 +94,27 @@ function TransparencyPage() {
             </div>
           ) : (
             <div className="relative">
+              {!locked && (
+                <div className="mb-6 flex flex-wrap gap-2">
+                  {([
+                    ["all", "All", counts.all],
+                    ["pending", "Pending", counts.pending],
+                    ["resolved", "Resolved", counts.resolved],
+                    ["denied", "Denied", counts.denied],
+                  ] as const).map(([value, label, count]) => (
+                    <button
+                      key={value}
+                      onClick={() => setFilter(value)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${filter === value ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:bg-accent"}`}
+                    >
+                      {label} <span className="ml-1 opacity-70">{count}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className={locked ? "space-y-4 select-none pointer-events-none [filter:blur(8px)]" : "space-y-4"} aria-hidden={locked}>
-                {data.map((s, i) => {
-                  const statusLabel = s.status.replace(/_/g, " ");
+                {visibleSuggestions.map((s, i) => {
+                  const statusLabel = getSuggestionStatusLabel(s.status, true);
                   const isResolved = s.status === "resolved";
                   const dateStr = isResolved && s.resolved_at
                     ? new Date(s.resolved_at).toLocaleDateString()
@@ -84,7 +136,7 @@ function TransparencyPage() {
                     </div>
                     <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{s.body}</p>
                     <div className="mt-4 flex items-center gap-2 text-xs">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 capitalize ${isResolved ? "bg-emerald/10 text-emerald" : "bg-muted text-foreground/70"}`}>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 ${getStatusBadgeClass(s.status, true)}`}>
                         {isResolved && <CheckCircle2 className="h-3 w-3" />} {statusLabel}
                       </span>
                       <span className="text-muted-foreground">{s.upvotes_count} upvotes</span>

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/staff/")({
 function StaffDashboard() {
   const { user } = useAuth();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
 
     queryKey: ["staff-overview", user?.id],
     enabled: !!user?.id,
@@ -54,7 +54,9 @@ function StaffDashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((m, i) => (
+        {isLoading ? [1,2,3,4].map((i) => (
+          <div key={i} className="h-32 rounded-2xl bg-muted animate-pulse" />
+        )) : metrics.map((m, i) => (
           <div key={m.label} className="rounded-2xl border border-border bg-card p-5 hover-lift fade-up" style={{ animationDelay: `${i * 60}ms` }}>
             <div className="flex items-center justify-between">
               <div className="text-xs text-muted-foreground uppercase tracking-wider">{m.label}</div>
@@ -71,7 +73,9 @@ function StaffDashboard() {
             <h2 className="font-serif text-2xl">Recently resolved</h2>
             <Link to="/transparency" className="text-sm text-emerald hover:underline">View all</Link>
           </div>
-          {!data?.recent.length ? (
+          {isLoading ? (
+            <div className="space-y-3">{[1,2,3].map((i) => <div key={i} className="h-12 rounded-md bg-muted animate-pulse" />)}</div>
+          ) : !data?.recent.length ? (
             <p className="text-sm text-muted-foreground">No resolved items yet.</p>
           ) : (
             <ul className="divide-y divide-border">

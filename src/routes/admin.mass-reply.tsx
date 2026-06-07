@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Send } from "lucide-react";
+import { getSuggestionStatusLabel, STAFF_STATUS_OPTIONS } from "@/lib/suggestion-status";
 
-const STATUSES = ["submitted","under_review","in_progress","resolved","rejected"] as const;
+const STATUSES = STAFF_STATUS_OPTIONS.map((option) => option.value);
 const CATEGORIES = ["all","academics","hostel","cafeteria","security","administration","ict","infrastructure","sports","other"] as const;
 
 export const Route = createFileRoute("/admin/mass-reply")({
@@ -93,7 +94,7 @@ function MassReply() {
               <Label className="text-xs">Status</Label>
               <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full h-9 rounded-md border border-input bg-transparent px-2 text-sm">
                 <option value="all">All</option>
-                {STATUSES.map((s) => <option key={s} value={s} className="capitalize">{s.replace("_"," ")}</option>)}
+                {STATUSES.map((s) => <option key={s} value={s}>{getSuggestionStatusLabel(s)}</option>)}
               </select>
             </div>
           </div>
@@ -113,7 +114,7 @@ function MassReply() {
             <Label className="text-xs">Also set status (optional)</Label>
             <select value={setStatusTo} onChange={(e) => setSetStatusTo(e.target.value)} className="mt-1 w-full h-9 rounded-md border border-input bg-transparent px-2 text-sm">
               <option value="">Don't change status</option>
-              {STATUSES.map((s) => <option key={s} value={s} className="capitalize">Set to {s.replace("_"," ")}</option>)}
+              {STATUSES.map((s) => <option key={s} value={s}>Set to {getSuggestionStatusLabel(s)}</option>)}
             </select>
           </div>
           <Button onClick={send} disabled={sending || !matches?.length} className="w-full">

@@ -61,6 +61,7 @@ function SubmitPage() {
     if (body.trim().length < 20) return toast.error("Please describe your suggestion (at least 20 characters)");
     if (!user) return toast.error("You must be signed in");
     setLoading(true);
+    const toastId = toast.loading("Submitting your suggestion…");
     const { data, error } = await supabase.from("suggestions").insert({
       author_id: anonymous ? null : user.id,
       title: title.trim(),
@@ -70,7 +71,11 @@ function SubmitPage() {
       department_id: departmentId || null,
       is_anonymous: anonymous,
     }).select("id").single();
-    if (error || !data) { setLoading(false); return toast.error(error?.message ?? "Failed to submit"); }
+    if (error || !data) {
+      setLoading(false);
+      toast.dismiss(toastId);
+      return toast.error(error?.message ?? "Failed to submit");
+    }
 
     // Upload attachments (best-effort)
     for (const f of files) {
@@ -86,6 +91,7 @@ function SubmitPage() {
       });
     }
     setLoading(false);
+    toast.dismiss(toastId);
     toast.success("Suggestion submitted");
     navigate({ to: "/app/suggestions/$id", params: { id: data.id } });
   };
