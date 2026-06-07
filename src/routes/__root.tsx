@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import "../styles.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider, useAuth } from "@/components/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -105,6 +104,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ClientStyles() {
+  useEffect(() => {
+    void import("../styles.css");
+  }, []);
+
+  return null;
+}
+
 function AuthInvalidator() {
   const router = useRouter();
   const qc = useQueryClient();
@@ -144,6 +151,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          <ClientStyles />
           <AuthInvalidator />
           <GlobalLoadingIndicator />
           <Outlet />
