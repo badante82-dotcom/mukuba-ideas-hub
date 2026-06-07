@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider, useAuth } from "@/components/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import appCss from "../styles.css?inline";
 
 function NotFoundComponent() {
   return (
@@ -85,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c6bc1b7f-2f88-4e21-9611-760f7ea417e3" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c6bc1b7f-2f88-4e21-9611-760f7ea417e3" },
     ],
+    styles: [{ children: appCss }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -102,14 +104,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
-}
-
-function ClientStyles() {
-  useEffect(() => {
-    void import("../styles.css");
-  }, []);
-
-  return null;
 }
 
 function AuthInvalidator() {
@@ -151,7 +145,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <ClientStyles />
           <AuthInvalidator />
           <GlobalLoadingIndicator />
           <Outlet />
