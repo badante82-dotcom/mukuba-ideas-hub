@@ -106,6 +106,21 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PreviewStylesFallback() {
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("__lovable_token");
+    if (!token || document.getElementById("preview-styles-fallback")) return;
+
+    const link = document.createElement("link");
+    link.id = "preview-styles-fallback";
+    link.rel = "stylesheet";
+    link.href = `${appCss}${appCss.includes("?") ? "&" : "?"}__lovable_token=${encodeURIComponent(token)}`;
+    document.head.appendChild(link);
+  }, []);
+
+  return null;
+}
+
 function AuthInvalidator() {
   const router = useRouter();
   const qc = useQueryClient();
@@ -145,6 +160,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          <PreviewStylesFallback />
           <AuthInvalidator />
           <GlobalLoadingIndicator />
           <Outlet />
