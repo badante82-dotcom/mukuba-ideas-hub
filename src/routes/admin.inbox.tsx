@@ -21,16 +21,52 @@ function Inbox() {
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<SuggestionStatus | "all">("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [duplicatesFor, setDuplicatesFor] = useState<{ id: string; title: string } | null>(null);
+  const [duplicatesLoading, setDuplicatesLoading] = useState(false);
+  const [duplicates, setDuplicates] = useState<SimilarMatch[]>([]);
+  const [merging, setMerging] = useState<string | null>(null);
+  const findSimilar = useServerFn(findSimilarToSuggestion);
+  const markDuplicate = useServerFn(markAsDuplicate);
+
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-inbox", filter],
     queryFn: async () => {
-      let q = supabase.from("suggestions").select("id,title,body,category,status,priority,created_at,responses_count").order("created_at", { ascending: false }).limit(100);
+      let q = supabase.from("suggestions").select("id,title,body,category,status,priority,created_at,responses_count,duplicate_of_id").order("created_at", { ascending: false }).limit(100);
       if (filter !== "all") q = q.eq("status", filter);
       const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const openDuplicates = async (id: string, title: string) => {
+    setDuplicatesFor({ id, title });
+    setDuplicates([]);
+    setDuplicatesLoading(true);
+    try {
+      const res = await findSimilar({ data: { id } });
+      setDuplicates(res.matches);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to find duplicates");
+    } finally {
+      setDuplicatesLoading(false);
+    }
+  };
+
+  const mergeInto = async (targetId: string) => {
+    if (!duplicatesFor) return;
+    setMerging(targetId);
+    try {
+      await markDuplicate({ data: { id: duplicatesFor.id, duplicateOfId: targetId } });
+      toast.success("Marked as duplicate");
+      setDuplicatesFor(null);
+      refetch();
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to merge");
+    } finally {
+      setMerging(null);
+    }
+  };
 
   const setStatus = async (id: string, status: SuggestionStatus) => {
     setUpdatingId(id);
