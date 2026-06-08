@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth-provider";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { Paperclip, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Paperclip, X, Sparkles } from "lucide-react";
+import { findSimilarSuggestions, embedSuggestion } from "@/lib/suggestions.functions";
+
+type SimilarMatch = { id: string; title: string; body: string; status: string; category: string; created_at: string; similarity: number };
 
 const CATEGORIES = ["academics","hostel","cafeteria","security","administration","ict","infrastructure","sports","other"] as const;
 const PRIORITIES = ["low","medium","high","urgent"] as const;
