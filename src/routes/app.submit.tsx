@@ -36,6 +36,10 @@ function SubmitPage() {
   const [anonymous, setAnonymous] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [similar, setSimilar] = useState<SimilarMatch[] | null>(null);
+  const findSimilar = useServerFn(findSimilarSuggestions);
+  const runEmbed = useServerFn(embedSuggestion);
 
   const { data: departments } = useQuery({
     queryKey: ["departments"],
