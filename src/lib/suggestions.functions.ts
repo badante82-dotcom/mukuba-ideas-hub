@@ -107,7 +107,7 @@ export const embedSuggestion = createServerFn({ method: "POST" })
     const vec = await embedText(`${s.title}\n\n${s.body}`);
     const { error: upErr } = await supabaseAdmin
       .from("suggestion_embeddings")
-      .upsert({ suggestion_id: s.id, embedding: vec as unknown as object });
+      .upsert({ suggestion_id: s.id, embedding: vec as unknown as never });
     if (upErr) throw new Error(upErr.message);
     return { ok: true };
   });
@@ -134,7 +134,7 @@ export const findSimilarToSuggestion = createServerFn({ method: "POST" })
         .from("suggestions").select("title,body").eq("id", data.id).maybeSingle();
       if (!s) throw new Error("Suggestion not found");
       query = await embedText(`${s.title}\n\n${s.body}`);
-      await supabaseAdmin.from("suggestion_embeddings").upsert({ suggestion_id: data.id, embedding: query as unknown as object });
+      await supabaseAdmin.from("suggestion_embeddings").upsert({ suggestion_id: data.id, embedding: query as unknown as never });
     }
 
     const { data: rows, error } = await supabaseAdmin
