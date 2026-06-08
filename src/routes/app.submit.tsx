@@ -63,11 +63,30 @@ function SubmitPage() {
     e.target.value = "";
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const checkSimilar = async () => {
     if (title.trim().length < 5) return toast.error("Title is too short");
     if (body.trim().length < 20) return toast.error("Please describe your suggestion (at least 20 characters)");
+    setChecking(true);
+    try {
+      const res = await findSimilar({ data: { title: title.trim(), body: body.trim() } });
+      if (res.matches.length > 0) {
+        setSimilar(res.matches);
+        setChecking(false);
+        return;
+      }
+      await doSubmit();
+    } catch (err) {
+      console.error(err);
+      // Fall through to submit even if similarity check fails
+      await doSubmit();
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const doSubmit = async () => {
     if (!user) return toast.error("You must be signed in");
+    setSimilar(null);
     setLoading(true);
     const toastId = toast.loading("Submitting your suggestion…");
     const { data, error } = await supabase.from("suggestions").insert({
@@ -98,10 +117,19 @@ function SubmitPage() {
         size_bytes: f.size,
       });
     }
+
+    // Fire-and-forget embedding so future duplicate checks include this suggestion
+    runEmbed({ data: { id: data.id } }).catch((err) => console.warn("Embed failed:", err));
+
     setLoading(false);
     toast.dismiss(toastId);
     toast.success("Suggestion submitted");
     navigate({ to: "/app/suggestions/$id", params: { id: data.id } });
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await checkSimilar();
   };
 
   return (
