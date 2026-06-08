@@ -124,20 +124,74 @@ function Inbox() {
             <article key={s.id} className="rounded-xl border border-border bg-card p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusBadgeClass(s.status)}`}>{getSuggestionStatusLabel(s.status)}</span>
                     <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{s.category}</span>
                     <span className="text-xs text-muted-foreground capitalize">• {s.priority}</span>
+                    {s.duplicate_of_id && (
+                      <Link to="/app/suggestions/$id" params={{ id: s.duplicate_of_id }} className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 hover:underline">Duplicate</Link>
+                    )}
                   </div>
                   <Link to="/app/suggestions/$id" params={{ id: s.id }} className="font-semibold hover:underline">{s.title}</Link>
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.body}</p>
                 </div>
-                <select value={s.status} disabled={updatingId === s.id} onChange={(e) => setStatus(s.id, e.target.value as SuggestionStatus)} className="h-8 rounded-md border border-input bg-transparent px-2 text-xs disabled:opacity-60">
-                  {STAFF_STATUS_OPTIONS.map((st) => <option key={st.value} value={st.value}>{st.label}</option>)}
-                </select>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <select value={s.status} disabled={updatingId === s.id} onChange={(e) => setStatus(s.id, e.target.value as SuggestionStatus)} className="h-8 rounded-md border border-input bg-transparent px-2 text-xs disabled:opacity-60">
+                    {STAFF_STATUS_OPTIONS.map((st) => <option key={st.value} value={st.value}>{st.label}</option>)}
+                  </select>
+                  <button onClick={() => openDuplicates(s.id, s.title)} className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded-md border border-border hover:bg-muted">
+                    <Sparkles className="h-3 w-3" /> Find duplicates
+                  </button>
+                </div>
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {duplicatesFor && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setDuplicatesFor(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-card max-w-2xl w-full rounded-2xl border border-border p-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="rounded-full bg-emerald/10 p-2"><Sparkles className="h-5 w-5 text-emerald" /></div>
+              <div className="min-w-0">
+                <h2 className="font-serif text-2xl">AI duplicate detection</h2>
+                <p className="text-sm text-muted-foreground mt-1 truncate">For: <span className="font-medium">{duplicatesFor.title}</span></p>
+              </div>
+            </div>
+            {duplicatesLoading ? (
+              <div className="flex items-center gap-2 text-muted-foreground py-10 justify-center">
+                <Loader2 className="h-4 w-4 animate-spin" /> Analysing similar suggestions…
+              </div>
+            ) : duplicates.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">No similar suggestions found.</div>
+            ) : (
+              <ul className="space-y-2 mb-5">
+                {duplicates.map((m) => (
+                  <li key={m.id} className="rounded-lg border border-border p-3">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{m.category}</span>
+                      <span className="text-xs text-muted-foreground">{Math.round(m.similarity * 100)}% match</span>
+                    </div>
+                    <Link to="/app/suggestions/$id" params={{ id: m.id }} className="font-semibold hover:underline block">{m.title}</Link>
+                    <div className="mt-2 flex justify-end">
+                      <button disabled={merging === m.id} onClick={() => mergeInto(m.id)} className="text-xs px-3 py-1.5 rounded-md bg-navy text-white disabled:opacity-60">
+                        {merging === m.id ? "Merging…" : "Mark as duplicate of this"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex justify-end gap-2">
+              {duplicatesFor && (
+                <button onClick={() => mergeInto(null as unknown as string)} className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted">
+                  Clear duplicate flag
+                </button>
+              )}
+              <button onClick={() => setDuplicatesFor(null)} className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted">Close</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
