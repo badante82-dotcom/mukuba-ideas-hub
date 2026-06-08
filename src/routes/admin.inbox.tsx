@@ -1,11 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getStatusBadgeClass, getSuggestionStatusLabel, STAFF_STATUS_OPTIONS, type SuggestionStatus } from "@/lib/suggestion-status";
+import { findSimilarToSuggestion, markAsDuplicate } from "@/lib/suggestions.functions";
+import { Sparkles, Loader2 } from "lucide-react";
 
 const STATUSES = STAFF_STATUS_OPTIONS.map((option) => option.value);
+
+type SimilarMatch = { id: string; title: string; status: string; category: string; similarity: number };
 
 export const Route = createFileRoute("/admin/inbox")({
   head: () => ({ meta: [{ title: "Admin — Inbox" }] }),
