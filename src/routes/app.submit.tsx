@@ -194,8 +194,40 @@ function SubmitPage() {
           <input type="checkbox" checked={anonymous} onChange={(e) => setAnonymous(e.target.checked)} className="h-4 w-4 rounded border-input" />
           Submit anonymously
         </label>
-        <Button type="submit" className="w-full" disabled={loading}>{loading ? "Submitting…" : "Submit suggestion"}</Button>
+        <Button type="submit" className="w-full" disabled={loading || checking}>
+          {checking ? "Checking for similar suggestions…" : loading ? "Submitting…" : "Submit suggestion"}
+        </Button>
       </form>
+
+      {similar && similar.length > 0 && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setSimilar(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-card max-w-2xl w-full rounded-2xl border border-border p-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="rounded-full bg-emerald/10 p-2"><Sparkles className="h-5 w-5 text-emerald" /></div>
+              <div>
+                <h2 className="font-serif text-2xl">Similar suggestions found</h2>
+                <p className="text-sm text-muted-foreground mt-1">Others may have already raised this. Consider upvoting an existing one — or submit yours anyway if it's different.</p>
+              </div>
+            </div>
+            <ul className="space-y-2 mb-5">
+              {similar.map((m) => (
+                <li key={m.id} className="rounded-lg border border-border p-3 hover:bg-accent/30">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{m.category}</span>
+                    <span className="text-xs text-muted-foreground">{Math.round(m.similarity * 100)}% match</span>
+                  </div>
+                  <Link to="/app/suggestions/$id" params={{ id: m.id }} className="font-semibold hover:underline block">{m.title}</Link>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{m.body}</p>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setSimilar(null)}>Go back &amp; edit</Button>
+              <Button type="button" onClick={doSubmit} disabled={loading}>{loading ? "Submitting…" : "Submit anyway"}</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
