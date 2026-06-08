@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth-provider";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { Paperclip, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Paperclip, X, Sparkles } from "lucide-react";
+import { findSimilarSuggestions, embedSuggestion } from "@/lib/suggestions.functions";
+
+type SimilarMatch = { id: string; title: string; body: string; status: string; category: string; created_at: string; similarity: number };
 
 const CATEGORIES = ["academics","hostel","cafeteria","security","administration","ict","infrastructure","sports","other"] as const;
 const PRIORITIES = ["low","medium","high","urgent"] as const;
@@ -32,6 +36,10 @@ function SubmitPage() {
   const [anonymous, setAnonymous] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [similar, setSimilar] = useState<SimilarMatch[] | null>(null);
+  const findSimilar = useServerFn(findSimilarSuggestions);
+  const runEmbed = useServerFn(embedSuggestion);
 
   const { data: departments } = useQuery({
     queryKey: ["departments"],
@@ -55,11 +63,30 @@ function SubmitPage() {
     e.target.value = "";
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const checkSimilar = async () => {
     if (title.trim().length < 5) return toast.error("Title is too short");
     if (body.trim().length < 20) return toast.error("Please describe your suggestion (at least 20 characters)");
+    setChecking(true);
+    try {
+      const res = await findSimilar({ data: { title: title.trim(), body: body.trim() } });
+      if (res.matches.length > 0) {
+        setSimilar(res.matches);
+        setChecking(false);
+        return;
+      }
+      await doSubmit();
+    } catch (err) {
+      console.error(err);
+      // Fall through to submit even if similarity check fails
+      await doSubmit();
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const doSubmit = async () => {
     if (!user) return toast.error("You must be signed in");
+    setSimilar(null);
     setLoading(true);
     const toastId = toast.loading("Submitting your suggestion…");
     const { data, error } = await supabase.from("suggestions").insert({
@@ -90,10 +117,19 @@ function SubmitPage() {
         size_bytes: f.size,
       });
     }
+
+    // Fire-and-forget embedding so future duplicate checks include this suggestion
+    runEmbed({ data: { id: data.id } }).catch((err) => console.warn("Embed failed:", err));
+
     setLoading(false);
     toast.dismiss(toastId);
     toast.success("Suggestion submitted");
     navigate({ to: "/app/suggestions/$id", params: { id: data.id } });
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await checkSimilar();
   };
 
   return (
@@ -158,8 +194,40 @@ function SubmitPage() {
           <input type="checkbox" checked={anonymous} onChange={(e) => setAnonymous(e.target.checked)} className="h-4 w-4 rounded border-input" />
           Submit anonymously
         </label>
-        <Button type="submit" className="w-full" disabled={loading}>{loading ? "Submitting…" : "Submit suggestion"}</Button>
+        <Button type="submit" className="w-full" disabled={loading || checking}>
+          {checking ? "Checking for similar suggestions…" : loading ? "Submitting…" : "Submit suggestion"}
+        </Button>
       </form>
+
+      {similar && similar.length > 0 && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setSimilar(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-card max-w-2xl w-full rounded-2xl border border-border p-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="rounded-full bg-emerald/10 p-2"><Sparkles className="h-5 w-5 text-emerald" /></div>
+              <div>
+                <h2 className="font-serif text-2xl">Similar suggestions found</h2>
+                <p className="text-sm text-muted-foreground mt-1">Others may have already raised this. Consider upvoting an existing one — or submit yours anyway if it's different.</p>
+              </div>
+            </div>
+            <ul className="space-y-2 mb-5">
+              {similar.map((m) => (
+                <li key={m.id} className="rounded-lg border border-border p-3 hover:bg-accent/30">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{m.category}</span>
+                    <span className="text-xs text-muted-foreground">{Math.round(m.similarity * 100)}% match</span>
+                  </div>
+                  <Link to="/app/suggestions/$id" params={{ id: m.id }} className="font-semibold hover:underline block">{m.title}</Link>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{m.body}</p>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setSimilar(null)}>Go back &amp; edit</Button>
+              <Button type="button" onClick={doSubmit} disabled={loading}>{loading ? "Submitting…" : "Submit anyway"}</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
