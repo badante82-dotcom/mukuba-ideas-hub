@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/forgot-password")({
-  head: () => ({ meta: [{ title: "Reset password — Mukuba Suggestion Box" }] }),
+  head: () => ({ meta: [{ title: "Reset password — Smart Mukuba Suggestion Box" }] }),
   component: ForgotPage,
 });
 

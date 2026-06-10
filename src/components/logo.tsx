@@ -10,7 +10,7 @@ export function Logo({ tone = "dark" }: { tone?: "dark" | "light" }) {
         <span className="absolute inset-0 bg-gradient-to-br from-emerald/15 via-transparent to-teal/15" />
       </div>
       <div className="leading-tight">
-        <div className={`text-sm font-semibold ${textColor}`}>Mukuba University</div>
+        <div className={`text-sm font-semibold ${textColor}`}>Smart Mukuba University</div>
         <div className={`text-xs ${subColor}`}>Suggestion Box</div>
       </div>
     </Link>

@@ -8,13 +8,14 @@ import {
   Wifi, Trophy, ShieldAlert, BookOpen, Hammer, ChevronDown,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ChatWidget } from "@/components/chat-widget";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Mukuba University — Online Suggestion Box" },
+      { title: "Smart Mukuba University Suggestion Box" },
       { name: "description", content: "Submit suggestions, track progress, and see real change at Mukuba University. A modern platform built on transparency, accountability, and action." },
-      { property: "og:title", content: "Mukuba University — Online Suggestion Box" },
+      { property: "og:title", content: "Smart Mukuba University Suggestion Box" },
       { property: "og:description", content: "Your voice. Your university. The official digital suggestion platform." },
     ],
   }),
@@ -53,6 +54,7 @@ function LandingPage() {
         <CtaBand />
       </main>
       <SiteFooter />
+      <ChatWidget />
     </div>
   );
 }

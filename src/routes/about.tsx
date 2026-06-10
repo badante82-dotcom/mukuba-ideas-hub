@@ -17,7 +17,7 @@ function Shell({ title, lead, children }: { title: string; lead?: string; childr
 }
 
 export const Route = createFileRoute("/about")({
-  head: () => ({ meta: [{ title: "About — Mukuba Suggestion Box" }, { name: "description", content: "About the Mukuba University Online Suggestion Box." }] }),
+  head: () => ({ meta: [{ title: "About — Smart Mukuba Suggestion Box" }, { name: "description", content: "About the Mukuba University Online Suggestion Box." }] }),
   component: () => (
     <Shell title="About the platform" lead="A modern, transparent channel between the Mukuba University community and its administration.">
       <p>The Online Suggestion Box replaces the traditional physical box with a secure digital workflow that routes every idea, concern and complaint to the right department — and keeps you informed every step of the way.</p>

@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/faq")({
-  head: () => ({ meta: [{ title: "FAQ — Mukuba Suggestion Box" }, { name: "description", content: "Frequently asked questions about the Mukuba suggestion platform." }] }),
+  head: () => ({ meta: [{ title: "FAQ — Smart Mukuba Suggestion Box" }, { name: "description", content: "Frequently asked questions about the Mukuba suggestion platform." }] }),
   component: () => (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />
