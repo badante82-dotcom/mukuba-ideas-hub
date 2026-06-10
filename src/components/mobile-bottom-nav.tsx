@@ -22,7 +22,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md">
-      <ul className={`grid grid-cols-${items.length}`}>
+      <ul className={items.length === 3 ? "grid grid-cols-3" : "grid grid-cols-4"}>
         {items.map((it) => (
           <li key={it.to}>
             <Link
