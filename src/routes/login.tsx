@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — Mukuba Suggestion Box" }, { name: "description", content: "Sign in to submit and track suggestions at Mukuba University." }] }),
+  head: () => ({ meta: [{ title: "Sign in — Smart Mukuba Suggestion Box" }, { name: "description", content: "Sign in to submit and track suggestions at Mukuba University." }] }),
   component: LoginPage,
 });
 

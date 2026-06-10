@@ -56,9 +56,11 @@ export function SiteHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link to="/app/my-suggestions"><Inbox className="mr-2 h-4 w-4" />My suggestions</Link>
-                </DropdownMenuItem>
+                {!isStaff && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/app/my-suggestions"><Inbox className="mr-2 h-4 w-4" />My suggestions</Link>
+                  </DropdownMenuItem>
+                )}
                 {isStaff && !isAdmin && (
                   <DropdownMenuItem asChild>
                     <Link to="/staff"><Briefcase className="mr-2 h-4 w-4" />Staff dashboard</Link>

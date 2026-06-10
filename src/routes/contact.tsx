@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Mail, Phone, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Contact — Mukuba Suggestion Box" }, { name: "description", content: "Get in touch with the Mukuba University suggestion platform team." }] }),
+  head: () => ({ meta: [{ title: "Contact — Smart Mukuba Suggestion Box" }, { name: "description", content: "Get in touch with the Mukuba University suggestion platform team." }] }),
   component: () => (
     <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />

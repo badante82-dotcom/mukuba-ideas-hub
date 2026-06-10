@@ -10,7 +10,7 @@ import { getStatusBadgeClass, getSuggestionStatusLabel, getTransparencyStatus, t
 import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/transparency")({
-  head: () => ({ meta: [{ title: "Transparency Portal — Mukuba Suggestion Box" }, { name: "description", content: "Browse resolved suggestions and see how Mukuba University is responding to its community." }] }),
+  head: () => ({ meta: [{ title: "Transparency Portal — Smart Mukuba Suggestion Box" }, { name: "description", content: "Browse resolved suggestions and see how Mukuba University is responding to its community." }] }),
   component: TransparencyPage,
 });
 
