@@ -8,6 +8,7 @@ import {
   Wifi, Trophy, ShieldAlert, BookOpen, Hammer, ChevronDown,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ChatWidget } from "@/components/chat-widget";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,6 +54,7 @@ function LandingPage() {
         <CtaBand />
       </main>
       <SiteFooter />
+      <ChatWidget />
     </div>
   );
 }
