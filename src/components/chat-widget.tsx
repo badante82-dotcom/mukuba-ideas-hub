@@ -111,8 +111,13 @@ export function ChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl px-3 py-2 bg-card border border-border text-sm text-muted-foreground flex items-center gap-2">
-                  <Loader2 className="h-3 w-3 animate-spin" /> Thinking…
+                <div className="rounded-2xl px-3 py-2 bg-card border border-border text-sm text-muted-foreground flex items-center gap-1.5">
+                  <span className="flex gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </span>
+                  <span className="ml-1">{thinkingText}</span>
                 </div>
               </div>
             )}
