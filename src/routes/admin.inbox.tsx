@@ -122,7 +122,7 @@ function Inbox() {
         <div className="space-y-3">
           {data.map((s) => (
             <article key={s.id} className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusBadgeClass(s.status)}`}>{getSuggestionStatusLabel(s.status)}</span>
@@ -135,14 +135,32 @@ function Inbox() {
                   <Link to="/app/suggestions/$id" params={{ id: s.id }} className="font-semibold hover:underline">{s.title}</Link>
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.body}</p>
                 </div>
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                  <select value={s.status} disabled={updatingId === s.id} onChange={(e) => setStatus(s.id, e.target.value as SuggestionStatus)} className="h-8 rounded-md border border-input bg-transparent px-2 text-xs disabled:opacity-60">
-                    {STAFF_STATUS_OPTIONS.map((st) => <option key={st.value} value={st.value}>{st.label}</option>)}
-                  </select>
-                  <button onClick={() => openDuplicates(s.id, s.title)} className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded-md border border-border hover:bg-muted">
-                    <Sparkles className="h-3 w-3" /> Find duplicates
-                  </button>
-                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-border flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Update status:</span>
+                {STAFF_STATUS_OPTIONS.map((st) => {
+                  const active = s.status === st.value;
+                  return (
+                    <button
+                      key={st.value}
+                      disabled={updatingId === s.id || active}
+                      onClick={() => setStatus(s.id, st.value)}
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition ${
+                        active
+                          ? `${getStatusBadgeClass(st.value)} border-transparent cursor-default`
+                          : "border-border hover:bg-muted hover:border-foreground/30"
+                      } disabled:opacity-60`}
+                    >
+                      {st.label}
+                    </button>
+                  );
+                })}
+                <button onClick={() => openDuplicates(s.id, s.title)} className="ml-auto text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:bg-muted">
+                  <Sparkles className="h-3 w-3" /> Find duplicates
+                </button>
+                <Link to="/app/suggestions/$id" params={{ id: s.id }} className="text-xs font-semibold text-emerald hover:underline">
+                  Open & respond →
+                </Link>
               </div>
             </article>
           ))}

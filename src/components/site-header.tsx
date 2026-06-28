@@ -19,6 +19,7 @@ export function SiteHeader() {
   const { theme, toggle } = useTheme();
   const { user, isAdmin, roles, loading } = useAuth();
   const isStaff = roles.includes("staff") || roles.includes("stakeholder");
+  const isStudent = roles.includes("student");
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -56,7 +57,7 @@ export function SiteHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {!isStaff && (
+                {isStudent && (
                   <DropdownMenuItem asChild>
                     <Link to="/app/my-suggestions"><Inbox className="mr-2 h-4 w-4" />My suggestions</Link>
                   </DropdownMenuItem>

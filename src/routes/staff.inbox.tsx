@@ -75,9 +75,9 @@ function StaffInbox() {
         <div className="space-y-3">
           {data.map((s) => (
             <article key={s.id} className="rounded-xl border border-border bg-card p-5 hover-lift">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusBadgeClass(s.status)}`}>{getSuggestionStatusLabel(s.status)}</span>
                     <span className="text-xs uppercase tracking-wider text-emerald font-semibold">{s.category}</span>
                     <span className="text-xs text-muted-foreground capitalize">• {s.priority}</span>
@@ -86,9 +86,29 @@ function StaffInbox() {
                   <Link to="/app/suggestions/$id" params={{ id: s.id }} className="font-semibold hover:underline">{s.title}</Link>
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.body}</p>
                 </div>
-                <select value={s.status} disabled={updatingId === s.id} onChange={(e) => setStatus(s.id, e.target.value as SuggestionStatus)} className="h-8 rounded-md border border-input bg-transparent px-2 text-xs disabled:opacity-60">
-                  {STAFF_STATUS_OPTIONS.map((st) => <option key={st.value} value={st.value}>{st.label}</option>)}
-                </select>
+              </div>
+              <div className="mt-4 pt-4 border-t border-border flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Update status:</span>
+                {STAFF_STATUS_OPTIONS.map((st) => {
+                  const active = s.status === st.value;
+                  return (
+                    <button
+                      key={st.value}
+                      disabled={updatingId === s.id || active}
+                      onClick={() => setStatus(s.id, st.value)}
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition ${
+                        active
+                          ? `${getStatusBadgeClass(st.value)} border-transparent cursor-default`
+                          : "border-border hover:bg-muted hover:border-foreground/30"
+                      } disabled:opacity-60`}
+                    >
+                      {st.label}
+                    </button>
+                  );
+                })}
+                <Link to="/app/suggestions/$id" params={{ id: s.id }} className="ml-auto text-xs font-semibold text-emerald hover:underline">
+                  Open & respond →
+                </Link>
               </div>
             </article>
           ))}

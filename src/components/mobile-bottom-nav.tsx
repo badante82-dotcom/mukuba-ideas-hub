@@ -6,18 +6,30 @@ export function MobileBottomNav() {
   const { user, isAdmin, roles } = useAuth();
   if (!user) return null;
   const isStaff = roles.includes("staff") || roles.includes("stakeholder");
+  const isStudent = roles.includes("student");
 
-  const items = isStaff && !isAdmin
+  const items = isAdmin
+    ? [
+        { to: "/", label: "Home", icon: Home, exact: true },
+        { to: "/admin", label: "Admin", icon: BarChart3 },
+        { to: "/transparency", label: "Public", icon: BarChart3 },
+      ]
+    : isStaff
     ? [
         { to: "/", label: "Home", icon: Home, exact: true },
         { to: "/staff", label: "Inbox", icon: Briefcase },
         { to: "/transparency", label: "Public", icon: BarChart3 },
       ]
-    : [
+    : isStudent
+    ? [
         { to: "/", label: "Home", icon: Home, exact: true },
         { to: "/app/my-suggestions", label: "Inbox", icon: Inbox },
         { to: "/app/submit", label: "Submit", icon: PlusCircle, primary: true },
-        ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: BarChart3 }] : [{ to: "/transparency", label: "Public", icon: BarChart3 }]),
+        { to: "/transparency", label: "Public", icon: BarChart3 },
+      ]
+    : [
+        { to: "/", label: "Home", icon: Home, exact: true },
+        { to: "/transparency", label: "Public", icon: BarChart3 },
       ];
 
   return (
