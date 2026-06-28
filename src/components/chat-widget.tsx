@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, X, Send, Loader2 } from "lucide-react";
+import { Bot, X, Send } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { chatWithBot } from "@/lib/chatbot.functions";
 import { Button } from "@/components/ui/button";
@@ -7,22 +7,45 @@ import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const INITIAL: Msg = {
-  role: "assistant",
-  content: "Hi! I'm MukubaBot 🤖 — ask me anything about how the Smart Mukuba Suggestion Box works, how to submit, or how statuses get updated.",
-};
+const GREETINGS: string[] = [
+  "Hi there 👋 I'm MukubaBot. What's on your mind today — submitting something, tracking a reply, or just curious how this works?",
+  "Hey! MukubaBot here. Tell me what you're trying to do and I'll point you to the right spot.",
+  "Welcome 🤖 Need help with the Suggestion Box? Ask me anything — submissions, statuses, anonymity, anything goes.",
+  "Hi! I'm the support bot for the Smart Mukuba Suggestion Box. What can I help you figure out?",
+];
+
+const THINKING_PHRASES = [
+  "Thinking…",
+  "Looking that up…",
+  "Working on it…",
+  "One sec…",
+  "Pulling that together…",
+];
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Msg[]>([INITIAL]);
+  const [messages, setMessages] = useState<Msg[]>(() => [
+    { role: "assistant", content: GREETINGS[Math.floor(Math.random() * GREETINGS.length)] },
+  ]);
   const [loading, setLoading] = useState(false);
+  const [thinkingText, setThinkingText] = useState(THINKING_PHRASES[0]);
   const chat = useServerFn(chatWithBot);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, open]);
+  }, [messages, open, loading]);
+
+  // Cycle the "thinking" phrase while waiting so it feels alive.
+  useEffect(() => {
+    if (!loading) return;
+    setThinkingText(THINKING_PHRASES[Math.floor(Math.random() * THINKING_PHRASES.length)]);
+    const id = setInterval(() => {
+      setThinkingText(THINKING_PHRASES[Math.floor(Math.random() * THINKING_PHRASES.length)]);
+    }, 1800);
+    return () => clearInterval(id);
+  }, [loading]);
 
   const send = async () => {
     const text = input.trim();
@@ -37,11 +60,12 @@ export function ChatWidget() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong";
       toast.error(msg);
-      setMessages((m) => [...m, { role: "assistant", content: "Sorry — I hit an error. Please try again." }]);
+      setMessages((m) => [...m, { role: "assistant", content: "Hmm, I couldn't reach my brain just now — mind trying that again in a moment?" }]);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <>
