@@ -133,6 +133,28 @@ function SubmitPage() {
     await checkSimilar();
   };
 
+  if (authLoading) {
+    return <div className="max-w-2xl mx-auto text-sm text-muted-foreground">Loading…</div>;
+  }
+
+  if (user && !isStudent) {
+    return (
+      <div className="max-w-xl mx-auto fade-up">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <h1 className="font-serif text-3xl mb-2">Submissions are for students only</h1>
+          <p className="text-muted-foreground mb-6">
+            Your account is registered as staff/administrator. Only students can submit suggestions through this portal.
+            If you believe this is wrong, please contact the platform administrator.
+          </p>
+          <div className="flex justify-center gap-2">
+            <Link to="/transparency"><Button variant="outline">View transparency portal</Button></Link>
+            <Link to="/"><Button>Back home</Button></Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
