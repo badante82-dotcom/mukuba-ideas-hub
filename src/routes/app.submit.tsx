@@ -27,7 +27,8 @@ export const Route = createFileRoute("/app/submit")({
 
 function SubmitPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, roles, loading: authLoading } = useAuth();
+  const isStudent = roles.includes("student");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<typeof CATEGORIES[number]>("other");
