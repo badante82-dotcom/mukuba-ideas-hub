@@ -57,7 +57,7 @@ export function SiteHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {!isStaff && (
+                {isStudent && (
                   <DropdownMenuItem asChild>
                     <Link to="/app/my-suggestions"><Inbox className="mr-2 h-4 w-4" />My suggestions</Link>
                   </DropdownMenuItem>
