@@ -19,6 +19,7 @@ export function SiteHeader() {
   const { theme, toggle } = useTheme();
   const { user, isAdmin, roles, loading } = useAuth();
   const isStaff = roles.includes("staff") || roles.includes("stakeholder");
+  const isStudent = roles.includes("student");
 
   const signOut = async () => {
     await supabase.auth.signOut();
