@@ -23,12 +23,27 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     const toastId = toast.loading("Signing you in…");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !signIn.user) {
+      setLoading(false);
+      toast.dismiss(toastId);
+      return toast.error(error?.message ?? "Sign in failed");
+    }
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", signIn.user.id);
+    const roles = (roleRows ?? []).map((r) => r.role as string);
     setLoading(false);
     toast.dismiss(toastId);
-    if (error) return toast.error(error.message);
     toast.success("Welcome back");
-    navigate({ to: "/app/my-suggestions" });
+    if (roles.includes("admin") || roles.includes("super_admin")) {
+      navigate({ to: "/admin" });
+    } else if (roles.includes("staff") || roles.includes("stakeholder")) {
+      navigate({ to: "/staff" });
+    } else {
+      navigate({ to: "/app/my-suggestions" });
+    }
   };
 
   return (
